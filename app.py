@@ -14,34 +14,49 @@ app = Dash(__name__)
 
 # Affichage de l'app
 app.layout = html.Div([
+    # Titre de la page
     html.H1(children='Tree Dash App', style={'textAlign': 'center', 'fontFamily':'Verdana'}),
     
-    # Menu déroulant des DOMANIALITE pour les histogrammes
-    dcc.Dropdown(
-        id='dom-dropdown',
-        options=[{'label': dom, 'value': dom} for dom in df['DOMANIALITE'].unique()]
-    ),
-    
-    # Menu déroulant des STADE DE DEVELOPPEMENT pour les histogrammes
-    dcc.Dropdown(
-        id='stage-dropdown',
-        options=[{'label': stage, 'value': stage} for stage in df['STADE DE DEVELOPPEMENT'].unique() if pd.notnull(stage)]
-    ),
-    
-    # Graphiques
-    dcc.Graph(id='height-histogram'),
-    dcc.Graph(id='circumference-histogram'),
+    # Bloc menus déroulants
+    html.Div([
+        html.P('Sélectionnez un domaine et un stade de développement', style={'textAlign': 'center', 'fontFamily':'Verdana'}),
+        dcc.Dropdown(
+                id='dom-dropdown',
+                options=[{'label': dom, 'value': dom} for dom in df['DOMANIALITE'].unique()],
+                style={'width': '50%', 'margin': 'auto'}
+            ),
+        dcc.Dropdown(
+                id='stage-dropdown',
+                options=[{'label': stage, 'value': stage} for stage in df['STADE DE DEVELOPPEMENT'].unique() if pd.notnull(stage)],
+                style={'width': '50%', 'margin': 'auto'}
+            ),
+        ]),
 
-    # Menu déroulant des STADE DE DEVELOPPEMENT pour la carte
-    dcc.Dropdown(
-        id='map-stage-dropdown',
-        options=[{'label': stage, 'value': stage} for stage in df['STADE DE DEVELOPPEMENT'].unique() if pd.notnull(stage)],
-        value=[],
-        multi=True
-    ),
-    
-    # Carte
-    dcc.Graph(id='tree-map', style={'height': '70vh'})
+    # Bloc histogrammes 
+    html.Div([
+        # Bloc histogramme hauteur
+        html.Div([
+            dcc.Graph(id='height-histogram')   
+        ], style={'width': '50%', 'display': 'inline-block'}),
+        
+        # Bloc histogramme circonférence
+        html.Div([
+            dcc.Graph(id='circumference-histogram')
+        ], style={'width': '50%', 'display': 'inline-block'})
+    ]),
+
+    # Bloc carte
+    html.Div([
+        html.P('Sélectionnez un stade de développement', style={'textAlign': 'center', 'fontFamily':'Verdana'}),
+        dcc.Dropdown(
+            id='map-stage-dropdown',
+            options=[{'label': stage, 'value': stage} for stage in df['STADE DE DEVELOPPEMENT'].unique() if pd.notnull(stage)],
+            multi=True,
+            value=[],
+            style={'width': '70%', 'margin': 'auto'}
+        ),
+        dcc.Graph(id='tree-map', style={'height': '70vh'})
+    ])
 ])
 
 # Callback pour mettre à jour les histogrammes en fonction des menus déroulants
@@ -81,7 +96,7 @@ def update_tree_map(selected_map_stages):
         lat='LATITUDE',
         lon='LONGITUDE',
         color='STADE DE DEVELOPPEMENT',
-        title='Carte des arbres',
+        title='Carte de localisation des arbres',
         mapbox_style='open-street-map',
         zoom=10
     )
